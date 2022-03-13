@@ -34,8 +34,8 @@ app.use(express.json());
 app.use(express.static('public'));
 
 
-function findById(id, notesArray) {
-    const result = notesArray.filter(note => note.id === id)[0];
+function findById(id, notes) {
+    const result = notes.filter(note => note.id === id)[0];
     return result;
 }
 function createNewNote(body, notesArray) {
@@ -65,11 +65,11 @@ function validateNote(note) {
 
 
 
-// API route HTTP GET request for all notes
+// API route GET request for all notes
 app.get('/api/notes/', (req, res) => {
     res.json(notes);
 });
-// API route HTTP GET request for note with particular id
+// API route GET request for note with particular id
 app.get('/api/notes/:id', (req, res) => {
     const result = findById(req.params.id, notes);
     if(result) {
@@ -78,7 +78,7 @@ app.get('/api/notes/:id', (req, res) => {
         res.status(404).send('Sorry, we cannot find that!')
     }
 });
-// API route HTTP POST request to save new note to db.json file
+// API route POST request to save new note to db.json file
 app.post('/api/notes', (req, res) => {
     // set id by calling var cuid
     req.body.id = cuid();
@@ -97,16 +97,14 @@ app.post('/api/notes', (req, res) => {
 });
 
 
-// HTML route HTTP GET request for index.html
+// HTML route GET request for index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'));
 });
-// HTML route HTTP GET request for notes.html
+// HTML route GET request for notes.html
 app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, './public/notes.html'));
 });
-
-
 
 
 // make our server listen by chaining the .listen method
