@@ -3,6 +3,9 @@ const express = require('express'); // 3rd-party module
 const fs = require('fs'); // built-in Node.js module
 const path = require('path'); // built-in Node.js module
 var cuid = require('cuid'); // 3rd-party module
+// import handleRenderSaveBtn from index.js
+// const handleRenderSaveBtn = require('./public/assets/js/index.js')
+
 
 const PORT = process.env.PORT || 3001;
 
@@ -20,19 +23,21 @@ const app = express();
 // JavaScript object. Both of the below middleware functions
 // need to be set up every time you create a server that's 
 // looking to accept POST data.
-
 // parse incoming string or array data from POST request sent by client to server
 app.use(express.urlencoded({ extended: true }));
 // parse incoming JSON data
 app.use(express.json());
-
+// provide a file path to the public folder and instruct 
+// the server to make these files static resources. This 
+// means that all of our front-end code can now be accessed 
+// without having a specific server endpoint created for it.
+app.use(express.static('public'));
 
 
 function findById(id, notesArray) {
     const result = notesArray.filter(note => note.id === id)[0];
     return result;
 }
-
 function createNewNote(body, notesArray) {
     // here you set the entirety of the body content to the constant note
     const note = body;
@@ -47,7 +52,6 @@ function createNewNote(body, notesArray) {
     );
     return note;
 }
-
 // ensure user has input note title and text
 function validateNote(note) {
     if (!note.title || typeof note.title !== 'string') {
@@ -59,12 +63,13 @@ function validateNote(note) {
     return true;
 }
 
-// HTTP GET request for all notes
+
+
+// API route HTTP GET request for all notes
 app.get('/api/notes/', (req, res) => {
     res.json(notes);
 });
-
-// HTTP GET request for note with particular id
+// API route HTTP GET request for note with particular id
 app.get('/api/notes/:id', (req, res) => {
     const result = findById(req.params.id, notes);
     if(result) {
@@ -73,8 +78,7 @@ app.get('/api/notes/:id', (req, res) => {
         res.status(404).send('Sorry, we cannot find that!')
     }
 });
-
-// HTTP POST request to save new note to db.json file
+// API route HTTP POST request to save new note to db.json file
 app.post('/api/notes', (req, res) => {
     // set id by calling var cuid
     req.body.id = cuid();
@@ -86,9 +90,23 @@ app.post('/api/notes', (req, res) => {
     } else {
         // add the new note to the notes array and db.json file
         const note = createNewNote(req.body, notes);
+        // handleRenderSaveBtn();
         res.json(note);
     }
+
 });
+
+
+// HTML route HTTP GET request for index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+// HTML route HTTP GET request for notes.html
+app.get('/notes', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/notes.html'));
+});
+
+
 
 
 // make our server listen by chaining the .listen method
