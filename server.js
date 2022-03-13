@@ -1,7 +1,8 @@
-
-const { notes } = require('./db/db');
-const express = require('express');
-var cuid = require('cuid');
+const { notes } = require('./db/db'); // JSON data file
+const express = require('express'); // 3rd-party module
+const fs = require('fs'); // built-in Node.js module
+const path = require('path'); // built-in Node.js module
+var cuid = require('cuid'); // 3rd-party module
 
 const PORT = process.env.PORT || 3001;
 
@@ -33,18 +34,29 @@ function findById(id, notesArray) {
 }
 
 function createNewNote(body, notesArray) {
-    // here you set the entirety of the body content to the constant animal
-    const animal = body;
-    // now you push that object to the end of the animal array
-    notesArray.push(animal);
-    // we need to save the Javascript array data as JSON,
-    // so we use JSON.stringify() to convert it
+    // here you set the entirety of the body content to the constant note
+    const note = body;
+    // now you push that object to the end of the note array
+    notesArray.push(note);
+    // use synchronous write file method
     fs.writeFileSync(
-      path.join(__dirname, '../data/animals.json'),
-      JSON.stringify({ animals: notesArray }, null, 2)
+      path.join(__dirname, './db/db.json'),
+        // we need to save the note array data as JSON,
+        // so we use JSON.stringify() to convert it
+      JSON.stringify({ notes: notesArray }, null, 2)
     );
-  
-    return animal;
+    return note;
+}
+
+// ensure user has input note title and text
+function validateNote(note) {
+    if (!note.title || typeof note.title !== 'string') {
+      return false;
+    }
+    if (!note.text || typeof note.text !== 'string') {
+      return false;
+    }
+    return true;
 }
 
 // HTTP GET request for all notes
@@ -55,7 +67,6 @@ app.get('/api/notes/', (req, res) => {
 // HTTP GET request for note with particular id
 app.get('/api/notes/:id', (req, res) => {
     const result = findById(req.params.id, notes);
-
     if(result) {
         res.json(result);
     } else{
@@ -68,10 +79,16 @@ app.post('/api/notes', (req, res) => {
     // set id by calling var cuid
     req.body.id = cuid();
     // req.body is where our incoming content will be
-    console.log('req.body is:', req.body);
-    res.json(req.body);
-  });
-
+    console.log('Note req.body is:', req.body);
+    // if any data in req.body is incorrect, send 400 error back
+    if (!validateNote(req.body)) {
+        res.status(400).send('Make sure to enter a note title and note content.');
+    } else {
+        // add the new note to the notes array and db.json file
+        const note = createNewNote(req.body, notes);
+        res.json(note);
+    }
+});
 
 
 // make our server listen by chaining the .listen method
