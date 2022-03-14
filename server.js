@@ -64,7 +64,6 @@ function validateNote(note) {
 }
 
 
-
 // API route GET request for all notes
 app.get('/api/notes/', (req, res) => {
     res.json(notes);
@@ -92,7 +91,6 @@ app.post('/api/notes', (req, res) => {
         const note = createNewNote(req.body, notes);
         res.json(note);
     }
-
 });
 
 
