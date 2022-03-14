@@ -90,7 +90,6 @@ app.post('/api/notes', (req, res) => {
     } else {
         // add the new note to the notes array and db.json file
         const note = createNewNote(req.body, notes);
-        // handleRenderSaveBtn();
         res.json(note);
     }
 
