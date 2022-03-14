@@ -34,8 +34,8 @@ app.use(express.json());
 app.use(express.static('public'));
 
 
-function findById(id, notes) {
-    const result = notes.filter(note => note.id === id)[0];
+function findById(id, notesArray) {
+    const result = notesArray.filter(note => note.id === id)[0];
     return result;
 }
 function createNewNote(body, notesArray) {
