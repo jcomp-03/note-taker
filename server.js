@@ -96,15 +96,20 @@ app.post('/api/notes', (req, res) => {
 });
 // API route DELETE request to delete note with particular id
 app.delete('/api/notes/:id', (req, res) => {
-    console.log('inside DELETE route');
+    // store the request object's property id in const noteId
     const noteId = req.params.id;
-    console.log('noteId is', noteId);
+    // run getNoteIndex function to find the index in the notes array
+    // of the note we want to delete 
     const unwantedNoteIndex = getNoteIndex(noteId, notes);
-    console.log('unwantedNoteIndex is', unwantedNoteIndex);
-    // update notes array, removing array element with
-    // the index that corresponds to unwanted note's id.
+    // update notes array, removing the note element with
+    // the index we just found in the line above
     notes.splice(unwantedNoteIndex, 1);
-    console.log('notes array is now', notes);
+    console.log('After deletion, notes array now looks like', notes);
+    // send back notes array as JSON; this allows for the
+    // left-hand column to dynamically update the moment
+    // a note is deleted, similar to when a note is saved
+    // the left-hand column updates dynamically
+    res.json(notes);
     // use synchronous write file method
     fs.writeFileSync(
         path.join(__dirname, './db/db.json'),
