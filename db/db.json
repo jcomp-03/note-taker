@@ -1,11 +1,6 @@
 {
   "notes": [
     {
-      "id": "0",
-      "title": "Test Title",
-      "text": "Test text"
-    },
-    {
       "id": "1",
       "title": "Your second note",
       "text": "Content for your second note"
@@ -16,19 +11,9 @@
       "text": "Content for your third note"
     },
     {
-      "title": "Your fourth note",
-      "text": "Content for your fourth note",
-      "id": "cl0onptbm0000dc0o21rpbz6b"
-    },
-    {
       "title": "Fifth noteee",
       "text": "Content for your fifth note",
       "id": "cl0ps1ocz0000l40oc8jj2q5s"
-    },
-    {
-      "title": "Sixth note",
-      "text": "Content for sixth note",
-      "id": "cl0pybk480000l80o31mp26b1"
     }
   ]
 }

@@ -3,9 +3,6 @@ const express = require('express'); // 3rd-party module
 const fs = require('fs'); // built-in Node.js module
 const path = require('path'); // built-in Node.js module
 var cuid = require('cuid'); // 3rd-party module
-// import handleRenderSaveBtn from index.js
-// const handleRenderSaveBtn = require('./public/assets/js/index.js')
-
 
 const PORT = process.env.PORT || 3001;
 
@@ -37,6 +34,11 @@ app.use(express.static('public'));
 function findById(id, notesArray) {
     const result = notesArray.filter(note => note.id === id)[0];
     return result;
+}
+function getNoteIndex(id, notesArray) {
+    console.log('inside getNoteIndex function');
+    const noteIndex = notesArray.findIndex(note => note.id === id);
+    return noteIndex;
 }
 function createNewNote(body, notesArray) {
     // here you set the entirety of the body content to the constant note
@@ -92,6 +94,26 @@ app.post('/api/notes', (req, res) => {
         res.json(note);
     }
 });
+// API route DELETE request to delete note with particular id
+app.delete('/api/notes/:id', (req, res) => {
+    console.log('inside DELETE route');
+    const noteId = req.params.id;
+    console.log('noteId is', noteId);
+    const unwantedNoteIndex = getNoteIndex(noteId, notes);
+    console.log('unwantedNoteIndex is', unwantedNoteIndex);
+    // update notes array, removing array element with
+    // the index that corresponds to unwanted note's id.
+    notes.splice(unwantedNoteIndex, 1);
+    console.log('notes array is now', notes);
+    // use synchronous write file method
+    fs.writeFileSync(
+        path.join(__dirname, './db/db.json'),
+          // we need to save the note array data as JSON,
+          // so we use JSON.stringify() to convert it
+        JSON.stringify({ notes: notes }, null, 2)
+    );
+});
+
 
 
 // HTML route GET request for index.html
