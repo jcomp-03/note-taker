@@ -1,4 +1,3 @@
-// const { notes } = require('./db/db'); // JSON data file
 const express = require('express'); // 3rd-party module
 const fs = require('fs'); // built-in Node.js module
 const path = require('path'); // built-in Node.js module
@@ -35,25 +34,12 @@ function findById(id, notesArray) {
     const result = notesArray.filter(note => note.id === id)[0];
     return result;
 }
+
 function getNoteIndex(id, notesArray) {
-    console.log('inside getNoteIndex function');
     const noteIndex = notesArray.findIndex(note => note.id === id);
     return noteIndex;
 }
-function createNewNote(body, notesArray) {
-    // here you set the entirety of the body content to the constant note
-    const note = body;
-    // now you push that object to the end of the note array
-    notesArray.push(note);
-    // use synchronous write file method
-    fs.writeFileSync(
-      path.join(__dirname, './db/db.json'),
-        // we need to save the note array data as JSON,
-        // so we use JSON.stringify() to convert it
-      JSON.stringify({ notes: notesArray }, null, 2)
-    );
-    return note;
-}
+
 // ensure user has input note title and text
 function validateNote(note) {
     if (!note.title || typeof note.title !== 'string') {
@@ -64,6 +50,7 @@ function validateNote(note) {
     }
     return true;
 }
+
 
 // HTML route GET request for index.html
 app.get('/', (req, res) => {
@@ -79,14 +66,15 @@ app.get('/notes', (req, res) => {
 app.get('/api/notes/', (req, res) => {
     fs.readFile('./db/db.json', 'utf8', (err, jsonData) => {
         if(err) throw err;
-        res.send(jsonData);
+        const { notes } = JSON.parse(jsonData); // notes is now an array of note objects
+        res.json(notes);
     });
 });
 // API route GET request for note with particular id
 app.get('/api/notes/:id', (req, res) => {
     fs.readFile('./db/db.json', 'utf8', (err, jsonData) => {
         if(err) throw err;
-        const { notes } = JSON.parse(jsonData); // notes is now an array of objects
+        const { notes } = JSON.parse(jsonData); // notes is now an array of note objects
         const result = findById(req.params.id, notes);
         if(result) {
             res.json(result);
@@ -96,7 +84,7 @@ app.get('/api/notes/:id', (req, res) => {
     });
 });
 // API route POST request to save new note to db.json file
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes/', (req, res) => {
     // set id by calling var cuid
     req.body.id = cuid();
     // req.body is where our incoming content will be
@@ -117,19 +105,15 @@ app.post('/api/notes', (req, res) => {
         // constant notes becomes an array of note objects after file read
         fs.readFile('./db/db.json', 'utf8', (err, jsonData) => {
             if (err) throw err;
-            console.log('jsonData is', jsonData); // DELETE LATER
             const { notes } = JSON.parse(jsonData);
-            console.log('notes is', notes); // DELETE LATER
             // push newNote to notes
             notes.push(newNote);
-            console.log('after pushing newNote, notes is', notes); // DELETE LATER
-            // send back json response to HTTP request
-            res.json(notes);
             // finally write back to the file db.json the notes array, stringified...
-            let stringifiedData = JSON.stringify({ notes: notes }, null, 2);
-            console.log('stringifiedData is', stringifiedData); // DELETE LATER
-            fs.writeFileSync('./db/db.json', stringifiedData, (err) => {
+            const stringifiedData = JSON.stringify({ notes: notes }, null, 2);
+            fs.writeFile('./db/db.json', stringifiedData, (err) => {
                 if (err) throw err;
+                // send back json response to HTTP request
+                res.json(notes);
             });
         });
     }
@@ -138,6 +122,11 @@ app.post('/api/notes', (req, res) => {
 app.delete('/api/notes/:id', (req, res) => {
     // store the request object's property id in const noteId
     const noteId = req.params.id;
+    // use synchronous readFile method
+    const jsonData = fs.readFileSync('./db/db.json', 'utf8');
+    // console.log('jsonData is', jsonData);
+    const {notes} = JSON.parse(jsonData);
+    // console.log('notes is', notes);
     // run getNoteIndex function to find the index in the notes array
     // of the note we want to delete 
     const unwantedNoteIndex = getNoteIndex(noteId, notes);
@@ -145,16 +134,13 @@ app.delete('/api/notes/:id', (req, res) => {
     // the index we just found in the line above
     notes.splice(unwantedNoteIndex, 1);
     console.log('After deletion, notes array now looks like', notes);
-    // send back notes array as JSON; this allows for the
-    // left-hand column to dynamically update the moment
-    // a note is deleted, similar to when a note is saved
-    // the left-hand column updates dynamically
     res.json(notes);
-    // use synchronous write file method
+    // use synchronous writeFile method
     fs.writeFileSync(
         path.join(__dirname, './db/db.json'),
           // we need to save the note array data as JSON,
-          // so we use JSON.stringify() to convert it
+          // so we use JSON.stringify() to convert it to
+          // JSON format
         JSON.stringify({ notes: notes }, null, 2)
     );
 });
