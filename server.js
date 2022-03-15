@@ -1,4 +1,4 @@
-const { notes } = require('./db/db'); // JSON data file
+// const { notes } = require('./db/db'); // JSON data file
 const express = require('express'); // 3rd-party module
 const fs = require('fs'); // built-in Node.js module
 const path = require('path'); // built-in Node.js module
@@ -65,19 +65,35 @@ function validateNote(note) {
     return true;
 }
 
+// HTML route GET request for index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+// HTML route GET request for notes.html
+app.get('/notes', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/notes.html'));
+});
+
 
 // API route GET request for all notes
 app.get('/api/notes/', (req, res) => {
-    res.json(notes);
+    fs.readFile('./db/db.json', 'utf8', (err, jsonData) => {
+        if(err) throw err;
+        res.send(jsonData);
+    });
 });
 // API route GET request for note with particular id
 app.get('/api/notes/:id', (req, res) => {
-    const result = findById(req.params.id, notes);
-    if(result) {
-        res.json(result);
-    } else{
-        res.status(404).send('Sorry, we cannot find that!')
-    }
+    fs.readFile('./db/db.json', 'utf8', (err, jsonData) => {
+        if(err) throw err;
+        const { notes } = JSON.parse(jsonData); // notes is now an array of objects
+        const result = findById(req.params.id, notes);
+        if(result) {
+            res.json(result);
+        } else{
+            res.status(404).send('Sorry, we cannot find that note id!')
+        }
+    });
 });
 // API route POST request to save new note to db.json file
 app.post('/api/notes', (req, res) => {
@@ -85,13 +101,37 @@ app.post('/api/notes', (req, res) => {
     req.body.id = cuid();
     // req.body is where our incoming content will be
     console.log('Note req.body is:', req.body);
-    // if any data in req.body is incorrect, send 400 error back
+    // if title or note text is missing, send 400 error back
     if (!validateNote(req.body)) {
         res.status(400).send('Make sure to enter a note title and note content.');
     } else {
-        // add the new note to the notes array and db.json file
-        const note = createNewNote(req.body, notes);
-        res.json(note);
+        // destructure req.body properties into the corresponding variables
+        const { title, text, id } = req.body;
+        // note object we'll save to db.json in a moment
+        const newNote = {
+            title: title,
+            text: text,
+            id: id
+        };
+        // read the db.json file and assign parsed contents to constant notes
+        // constant notes becomes an array of note objects after file read
+        fs.readFile('./db/db.json', 'utf8', (err, jsonData) => {
+            if (err) throw err;
+            console.log('jsonData is', jsonData); // DELETE LATER
+            const { notes } = JSON.parse(jsonData);
+            console.log('notes is', notes); // DELETE LATER
+            // push newNote to notes
+            notes.push(newNote);
+            console.log('after pushing newNote, notes is', notes); // DELETE LATER
+            // send back json response to HTTP request
+            res.json(notes);
+            // finally write back to the file db.json the notes array, stringified...
+            let stringifiedData = JSON.stringify({ notes: notes }, null, 2);
+            console.log('stringifiedData is', stringifiedData); // DELETE LATER
+            fs.writeFileSync('./db/db.json', stringifiedData, (err) => {
+                if (err) throw err;
+            });
+        });
     }
 });
 // API route DELETE request to delete note with particular id
@@ -117,17 +157,6 @@ app.delete('/api/notes/:id', (req, res) => {
           // so we use JSON.stringify() to convert it
         JSON.stringify({ notes: notes }, null, 2)
     );
-});
-
-
-
-// HTML route GET request for index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/index.html'));
-});
-// HTML route GET request for notes.html
-app.get('/notes', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/notes.html'));
 });
 
 
