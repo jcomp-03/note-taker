@@ -3,7 +3,7 @@ const htmlRoutes = require('./routes/htmlRoutes');
 const express = require('express'); // 3rd-party module
 const path = require('path'); // built-in Node.js module
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 const app = express();
 // The express.urlencoded({extended: true}) method is a method built into Express.js. It takes incoming
@@ -13,7 +13,7 @@ const app = express();
 // The express.json() method we used takes incoming POST  data in the form of JSON and parses it into the req.body
 // JavaScript object.
 // Both of the below middleware functions need to be set up every time you create a server that's 
-// looking to accept POST data. parse incoming string or array data from POST request sent by client to server
+// looking to accept POST data.
 app.use(express.urlencoded({ extended: true }));
 // parse incoming JSON data
 app.use(express.json());

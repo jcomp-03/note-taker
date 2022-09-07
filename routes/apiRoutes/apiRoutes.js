@@ -6,7 +6,6 @@ const fs = require('fs');
 var cuid = require('cuid'); // 3rd-party module
 const path = require('path'); // built-in Node.js module
 
-
 // API route GET request for all notes
 router.get('/notes/', (req, res) => {
     fs.readFile('./db/db.json', 'utf8', (err, jsonData) => {
@@ -86,9 +85,9 @@ router.delete('/notes/:id', (req, res) => {
     // use synchronous writeFile method
     fs.writeFileSync(
         path.join(__dirname, '../../db/db.json'),
-          // we need to save the note array data as JSON,
-          // so we use JSON.stringify() to convert it to
-          // JSON format
+        // we need to save the note array data as JSON,
+        // so we use JSON.stringify() to convert it to
+        // JSON format
         JSON.stringify({ notes: notes }, null, 2)
     );
 });
