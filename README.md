@@ -1,7 +1,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  # wk11-note-taker
+  # note-taker
   ## Project Description
-  This application makes use of the Express.js web framework for Node.js to store and retrieve notes that the user makes to the application. The Express.js back end serves static HTML files, and is configured to   handle GET and POST requests, i.e. retrieve notes from the JSON file and saves notes to the JSON file. This application runs from a server.js file and is deployed to the Heroku platform as a result. In working through this application, a better understanding of how client-side requests relate to server-side responses was reached, as well as gave practice in parsing required and optional parameters when creating the server-side routes. To handle client-side server requests outside of a browser, i.e. testing the validity of our API routes, the REST API client Insomnia was used. Finally, the introduction to Heroku for hosting the Node.js process which powers the application was challengining in a few moments but overall a good experience. 
+  This application makes use of the Express.js web framework for Node.js to store and retrieve notes that the user makes to the application. The Express.js back end serves static HTML files, and is configured to   handle GET and POST requests, i.e. retrieve notes from the JSON file and saves notes to the JSON file. This application runs from a server.js file and is deployed to the Heroku platform as a result. In working through this application, a better understanding of how client-side requests relate to server-side responses was reached, as well as gave practice in parsing required and optional parameters when creating the server-side routes. To handle client-side server requests outside of a browser, i.e. testing the validity of our API routes, the REST API client Insomnia was used. Finally, the introduction to Heroku for hosting the Node.js process which powers the application was challengining in a few moments but overall a good experience.
+  - Configure an Express.js back end to serve static HTML files.
+  - Configure an Express.js back end to create an API to handle GET and POST requests.
+  - Parse parameters in server-side routes.
+  - Submit form data to a server.
+  - Implement separation of concerns for routing.
+  - Deploy a server-side application to the Heroku platform.
   ## Table of Contents
   * [Installation](#installation)
   * [Usage](#usage)
